@@ -5,9 +5,9 @@ import {
   GraphQLID,
   GraphQLString,
   GraphQLList,
-} from 'graphql';
+} from "graphql";
 const PersonType = new GraphQLObjectType({
-  name: 'Person',
+  name: "Person",
   fields: {
     id: { type: GraphQLID },
     name: { type: GraphQLString },
@@ -15,13 +15,13 @@ const PersonType = new GraphQLObjectType({
 });
 
 const peopleData = [
-  { id: 1, name: 'John Smith' },
-  { id: 2, name: 'Sara Smith' },
-  { id: 3, name: 'Budd Deey' },
+  { id: 1, name: "John Smith" },
+  { id: 2, name: "Sara Smith" },
+  { id: 3, name: "Budd Deey" },
 ];
 
 const QueryType = new GraphQLObjectType({
-  name: 'Query',
+  name: "Query",
   fields: {
     people: {
       type: new GraphQLList(PersonType),
@@ -31,7 +31,7 @@ const QueryType = new GraphQLObjectType({
 });
 
 const MutationType = new GraphQLObjectType({
-  name: 'Mutation',
+  name: "Mutation",
   fields: {
     addPerson: {
       type: PersonType,
@@ -46,7 +46,7 @@ const MutationType = new GraphQLObjectType({
 
         peopleData.push(person);
         return person;
-      }
+      },
     },
   },
 });
@@ -57,11 +57,11 @@ const schema = new GraphQLSchema({ query: QueryType, mutation: MutationType });
 import { graphql, print } from "graphql";
 import { ApolloLink, Observable } from "@apollo/client";
 function delay(wait) {
-  return new Promise(resolve => setTimeout(resolve, wait));
+  return new Promise((resolve) => setTimeout(resolve, wait));
 }
 
-const link = new ApolloLink(operation => {
-  return new Observable(async observer => {
+const link = new ApolloLink((operation) => {
+  return new Observable(async (observer) => {
     const { query, operationName, variables } = operation;
     await delay(300);
     try {
@@ -71,7 +71,7 @@ const link = new ApolloLink(operation => {
         null,
         null,
         variables,
-        operationName,
+        operationName
       );
       observer.next(result);
       observer.complete();
@@ -113,11 +113,8 @@ const ADD_PERSON = gql`
 `;
 
 function App() {
-  const [name, setName] = useState('');
-  const {
-    loading,
-    data,
-  } = useQuery(ALL_PEOPLE);
+  const [name, setName] = useState("");
+  const { loading, data } = useQuery(ALL_PEOPLE);
 
   const [addPerson] = useMutation(ADD_PERSON, {
     update: (cache, { data: { addPerson: addPersonData } }) => {
@@ -127,13 +124,12 @@ function App() {
         query: ALL_PEOPLE,
         data: {
           ...peopleResult,
-          people: [
-            ...peopleResult.people,
-            addPersonData,
-          ],
+          people: [...peopleResult.people, addPersonData],
         },
       });
     },
+    onSuccess: () => console.log("does not run"),
+    onError: () => console.log("does not run"),
   });
 
   return (
@@ -148,12 +144,18 @@ function App() {
           type="text"
           name="name"
           value={name}
-          onChange={evt => setName(evt.target.value)}
+          onChange={(evt) => setName(evt.target.value)}
         />
         <button
           onClick={() => {
-            addPerson({ variables: { name } });
-            setName('');
+            addPerson(
+              { variables: { name } },
+              {
+                onSuccess: () => console.log("does not run"),
+                onError: () => console.log("does not run"),
+              }
+            );
+            setName("");
           }}
         >
           Add person
@@ -164,7 +166,7 @@ function App() {
         <p>Loading…</p>
       ) : (
         <ul>
-          {data?.people.map(person => (
+          {data?.people.map((person) => (
             <li key={person.id}>{person.name}</li>
           ))}
         </ul>
@@ -175,7 +177,7 @@ function App() {
 
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link
+  link,
 });
 
 render(
