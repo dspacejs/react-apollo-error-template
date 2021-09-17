@@ -128,8 +128,8 @@ function App() {
         },
       });
     },
-    onSuccess: () => console.log("does not run"),
-    onError: () => console.log("does not run"),
+    onCompleted: () => console.log("runs"),
+    onError: () => console.log("runs"),
   });
 
   return (
@@ -151,7 +151,7 @@ function App() {
             addPerson(
               { variables: { name } },
               {
-                onSuccess: () => console.log("does not run"),
+                onCompleted: () => console.log("does not run"),
                 onError: () => console.log("does not run"),
               }
             );
